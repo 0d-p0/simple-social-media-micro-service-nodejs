@@ -16,6 +16,10 @@ This service handles user authentication and related functionalities.
   - `model/`: Contains the user model.
   - `routes/`: Contains routes for authentication and user operations.
 
+- **Routes:**
+  - `POST /signup`: Register a new user.
+  - `POST /login`: Log in an existing user.
+
 ### Friendship Service
 
 This service manages friendships between users.
@@ -28,6 +32,10 @@ This service manages friendships between users.
   - `middleware/`: Contains middleware for authentication.
   - `model/`: Contains the friendship model.
   - `routes/`: Contains routes for managing friendships.
+ 
+- **Routes:**
+  - `POST /add-friend`: Add a new friend.
+  - `GET /all-friend`: Retrieve all friends of a user.
 
 ### Post Service
 
@@ -41,13 +49,20 @@ This service handles posts made by users.
   - `middleware/`: Contains middleware for authentication.
   - `model/`: Contains the post model.
   - `routes/`: Contains routes for managing posts.
+ 
+- **Routes:**
+  - `POST /create-post`: Create a new post.
+  - `GET /like/:postId`: Like a post.
+  - `POST /add-comment`: Add a comment to a post.
+  - `POST /delete-post/:postId`: Delete a post.
+
 
 ## Getting Started
 
 To run each microservice locally, follow these steps:
 
 1. Clone this repository.
-2. Navigate to the directory of the microservice you want to run.
+2. Navigate to the each directory of the microservice.
 3. Install dependencies using `npm install`.
 4. Start the microservice using `npm start`.
 
