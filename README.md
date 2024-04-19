@@ -10,7 +10,7 @@ This service handles user authentication and related functionalities.
 
 - **Files:**
   - `.env`: Environment variables configuration file.
-  - `config.js`: Configuration file for the authentication service.
+  - `config.js`: Configuration file for the Mongodb service.
   - `index.js`: Entry point of the authentication service.
   - `controller/`: Contains controllers for handling authentication and user-related operations.
   - `model/`: Contains the user model.
@@ -22,7 +22,7 @@ This service manages friendships between users.
 
 - **Files:**
   - `.env`: Environment variables configuration file.
-  - `config.js`: Configuration file for the friendship service.
+  - `config.js`: Configuration file for the Mongodb service.
   - `index.js`: Entry point of the friendship service.
   - `controller/`: Contains controllers for handling friendship-related operations.
   - `middleware/`: Contains middleware for authentication.
@@ -35,7 +35,7 @@ This service handles posts made by users.
 
 - **Files:**
   - `.env`: Environment variables configuration file.
-  - `config.js`: Configuration file for the post service.
+  - `config.js`: Configuration file for the Mongodb service.
   - `index.js`: Entry point of the post service.
   - `controller/`: Contains controllers for handling post-related operations.
   - `middleware/`: Contains middleware for authentication.
