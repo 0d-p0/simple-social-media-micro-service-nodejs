@@ -1,30 +1,60 @@
 import Friendship from "../model/friendshipModel.js";
-import  axios from 'axios'
+import axios from "axios";
 // Controller to add a friend
 export const addFriendController = async (req, res) => {
   try {
-
-    const userId = req.user
+    const userId = req.user;
     const { recipient } = req.body;
-    if(!recipient){
-        return res.status(303).json({
-            success:false,
-            message : " recipient is required"
-        })
+    if (!recipient) {
+      return res.status(303).json({
+        success: false,
+        message: " recipient is required",
+      });
+    }
+    if (recipient === userId) {
+      return res.status(303).json({
+        success: false,
+        message: "action bloked you can`t add friend as your self",
+      });
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/is-user/${recipient}`
+      );
+
+  
+    } catch (error) {
+      console.log(error.response)
+      if (error.response && error.response.status === 404) {
+        return res.status(404).json({
+          success: false,
+          message: error.response.data.message || "User not found",
+        });
+      }
+      // Handle other errors related to the axios request
+      return res.status(500).json({
+        success: false,
+        message: "Error occurred while checking user existence",
+        error: error.message,
+      });
     }
 
     // Check if the friendship already exists
-    const existingFriendship = await Friendship.findOne({ requester : userId, recipient });
+    const existingFriendship = await Friendship.findOne({
+      requester: userId,
+      recipient,
+    });
     if (existingFriendship) {
       return res.status(400).json({
         success: false,
         message: "Friendship already exists",
-        existingFriendship
+        existingFriendship,
       });
     }
 
     // Create a new friendship
-    const friendship = new Friendship({ requester : userId, recipient });
+    const friendship = new Friendship({ requester: userId, recipient });
     await friendship.save();
 
     res.status(201).json({
@@ -32,6 +62,8 @@ export const addFriendController = async (req, res) => {
       message: "Friend added successfully",
       friendship,
     });
+
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -48,7 +80,10 @@ export const removeFriendController = async (req, res) => {
     const { requester, recipient } = req.body;
 
     // Check if the friendship exists
-    const friendship = await Friendship.findOneAndDelete({ requester, recipient });
+    const friendship = await Friendship.findOneAndDelete({
+      requester,
+      recipient,
+    });
     if (!friendship) {
       return res.status(404).json({
         success: false,
@@ -70,17 +105,18 @@ export const removeFriendController = async (req, res) => {
   }
 };
 
-
 // Controller to get all friends of a user
 export const getAllFriendsController = async (req, res) => {
   try {
-    const userId  = req.user;
+    const userId = req.user;
 
     // Find all friendships where the user is the requester or recipient
-    const friendships = await Friendship.find({ $or: [{ requester: userId }, { recipient: userId }] });
+    const friendships = await Friendship.find({
+      $or: [{ requester: userId }, { recipient: userId }],
+    });
 
     // Extract friend IDs from friendships
-    const friendIds = friendships.map(friendship => {
+    const friendIds = friendships.map((friendship) => {
       if (friendship.requester.toString() === userId) {
         return friendship.recipient.toString();
       } else {
@@ -88,40 +124,37 @@ export const getAllFriendsController = async (req, res) => {
       }
     });
 
-
     try {
-        const response = await axios.post('http://localhost:5000/api/friends',{
-            friendIds
-        })
-    
-        if(!response.data.success){
-           return res.status(404).json({
-            success:false,
-            message:response?.data?.message
-           })
-        }
+      const response = await axios.post("http://localhost:5000/api/friends", {
+        friendIds,
+      });
 
-
-      return  res.status(200).json({
-            success: true,
-            message: "Successfully retrieved friends",
-            friends:response.data.friends
-          });
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          return res.status(404).json({
-            success: false,
-            message: error.response.data.message||"User not found",
-          });
-        }
-        // Handle other errors related to the axios request
-        return res.status(500).json({
+      if (!response.data.success) {
+        return res.status(404).json({
           success: false,
-          message: "Error occurred while checking user existence",
-          error: error.message,
+          message: response?.data?.message,
         });
       }
 
+      return res.status(200).json({
+        success: true,
+        message: "Successfully retrieved friends",
+        friends: response.data.friends,
+      });
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return res.status(404).json({
+          success: false,
+          message: error.response.data.message || "User not found",
+        });
+      }
+      // Handle other errors related to the axios request
+      return res.status(500).json({
+        success: false,
+        message: "Error occurred while checking user existence",
+        error: error.message,
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -136,4 +169,3 @@ export const getAllFriendsController = async (req, res) => {
     });
   }
 };
-

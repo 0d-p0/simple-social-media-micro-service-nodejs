@@ -93,4 +93,26 @@ export const loginController = async (req, res) => {
   }
 };
 
+export const isUserExist =  async(req,res,next)=>{
+  try {
+    const {userId}=req.params
+    const user = await User.findById(userId)
+    console.log(user)
+    if(!user){
+      return res.status(404).json({
+        success:false,
+        message:"user not found"
+      })
+    }
+  
+    res.send("ok")
+  } catch (error) {
+    res.status(500).json({
+
+      success:false,
+      message:"some error occur please try again"
+    })
+  }
+};
+
 

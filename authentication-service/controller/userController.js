@@ -7,7 +7,6 @@ try {
 
     const friends = await User.find({ _id: { $in:friendIds } }).select("username posts");
 
-    console.log(friends)
 
     if(friends.length <= 0){
         return res.status(404).json({
@@ -28,3 +27,4 @@ try {
     })
 }
 }
+
