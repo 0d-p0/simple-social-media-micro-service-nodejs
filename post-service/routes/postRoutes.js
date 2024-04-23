@@ -37,7 +37,7 @@ router.route('/add-comment').post(isAuth,commentOnPostController)
 // Content-Type: application/json
 // Authorization: Bearer <token>
 
-router.route('/delete-post/:postId').post(isAuth,deletePostController)
+router.route('/delete-post/:postId').get(isAuth,deletePostController)
 
 // GET /api/all-post
 // Content-Type: application/json

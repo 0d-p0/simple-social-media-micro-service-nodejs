@@ -1,11 +1,9 @@
 import { Comment, Post } from "../model/postmodel.js";
-import axios from 'axios'
-
+import axios from "axios";
 
 export const createPostController = async (req, res) => {
   try {
-    
-    const  userId  = req.user;
+    const userId = req.user;
     const { content } = req.body;
 
     if (!content) {
@@ -21,33 +19,35 @@ export const createPostController = async (req, res) => {
       // ...(req.file && { image: req.file.buffer }),
     });
 
-      try {
-        const response = await axios.post('http://localhost:5000/api/add-post-id',{
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/add-post-id",
+        {
           userId,
-          savedPostId:post?._id
-        })
-    
-    
-        if(!response.data.success){
-           return res.status(404).json({
-            success:false,
-            message:response?.data?.message
-           })
+          savedPostId: post?._id,
         }
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          return res.status(404).json({
-            success: false,
-            message: "User not found",
-          });
-        }
-        // Handle other errors related to the axios request
-        return res.status(500).json({
+      );
+
+      if (!response.data.success) {
+        return res.status(404).json({
           success: false,
-          message: "Error occurred while checking user existence",
-          error: error.message,
+          message: response?.data?.message,
         });
       }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+      // Handle other errors related to the axios request
+      return res.status(500).json({
+        success: false,
+        message: "Error occurred while checking user existence",
+        error: error.message,
+      });
+    }
 
     await post.save();
 
@@ -57,7 +57,7 @@ export const createPostController = async (req, res) => {
       post,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     res.status(500).json({
       success: false,
       message: "Some error occurred, please try again",
@@ -66,13 +66,10 @@ export const createPostController = async (req, res) => {
   }
 };
 
-
-
-
 export const likePostController = async (req, res) => {
   try {
     const { postId } = req.params;
-    console.log(req.params)
+    console.log(req.params);
     const userId = req.user;
 
     const post = await Post.findById(postId);
@@ -112,13 +109,11 @@ export const likePostController = async (req, res) => {
   }
 };
 
-
-
 export const commentOnPostController = async (req, res) => {
   try {
     // const { postId } = req.params;
     const userId = req.user;
-    const { content,postId } = req.body;
+    const { content, postId } = req.body;
 
     if (!content) {
       return res.status(400).json({
@@ -162,14 +157,14 @@ export const commentOnPostController = async (req, res) => {
   }
 };
 
-
-
 // Controller for deleting a post
 export const deletePostController = async (req, res) => {
   try {
     // Extract post ID from request parameters
     const { postId } = req.params;
-    const  userId  = req.user;
+    const userId = req.user;
+
+    console.log(postId);
 
     // Check if the post exists
     const post = await Post.findById(postId);
@@ -180,8 +175,6 @@ export const deletePostController = async (req, res) => {
       });
     }
 
-
-  
     if (post.author.toString() !== userId) {
       return res.status(403).json({
         success: false,
@@ -189,26 +182,28 @@ export const deletePostController = async (req, res) => {
       });
     }
 
-
     try {
-      const response = await axios.post('http://localhost:5000/api/remove-post-id',{
-        userId,
-        removedPostId:post?._id
-      })
-  
-       console.log("hjkhjkhmkhjkm",response.data)
-      if(!response.data.success){
-         return res.status(404).json({
-          success:false,
-          message:response?.data?.message
-         })
+      const response = await axios.post(
+        "http://localhost:5000/api/remove-post-id",
+        {
+          userId,
+          removedPostId: post?._id,
+        }
+      );
+
+      console.log("hjkhjkhmkhjkm", response.data);
+      if (!response.data.success) {
+        return res.status(404).json({
+          success: false,
+          message: response?.data?.message,
+        });
       }
     } catch (error) {
-      console.log("error is = ",  error.response.data.message)
+      console.log("error is = ", error.response.data.message);
       if (error.response && error.response.status === 404) {
         return res.status(404).json({
           success: false,
-          message:  error.response.data.message || "User not found",
+          message: error.response.data.message || "User not found",
         });
       }
       // Handle other errors related to the axios request
@@ -217,8 +212,8 @@ export const deletePostController = async (req, res) => {
         message: "Error occurred while checking user existence",
         error: error.message,
       });
-    }    
-    
+    }
+
     // Delete the post
     await Post.deleteOne({ _id: postId });
 
@@ -238,18 +233,19 @@ export const deletePostController = async (req, res) => {
   }
 };
 
-
-export const allPostsController = async (req,res)=>{
+export const allPostsController = async (req, res) => {
   try {
-    const userId = req.user
+    const userId = req.user;
     const posts = await Post.find({ author: userId });
-    if(posts.length==0){
+    if (posts.length == 0) {
       return res.status(400).json({
-        success:false,
-        message:"no post found"
-      })
+        success: false,
+        message: "no post found",
+      });
     }
-    res.status(201).json({ success: true, posts });
+    res
+      .status(201)
+      .json({ success: true, message: "all posts are fetched", posts });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -257,39 +253,38 @@ export const allPostsController = async (req,res)=>{
       error: error.message,
     });
   }
-}
+};
 
-
-
-export const allFriendsPostsController = async (req,res)=>{
+export const allFriendsPostsController = async (req, res) => {
   try {
-    const userId = req.user
-    const token = req.token
-    const response = await axios.get('http://localhost:5002/api/all-friend',{
-      headers:{
-        'Authorization':`Bearer ${token}`
-      }
-    })
-  
-    if(!response.data.success){
-       return res.status(404).json({
-        success:false,
-        message:response?.data?.message
-       })
+    const userId = req.user;
+    const token = req.token;
+    const response = await axios.get("http://localhost:5002/api/all-friend", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.success) {
+      return res.status(404).json({
+        success: false,
+        message: response?.data?.message,
+      });
     }
-   const friendlist =response.data.friends.map(user=>user._id)
+    const friendlist = response.data.friends.map((user) => user._id);
 
+    const posts = await Post.find({ author: { $in: friendlist } });
 
-   const posts = await Post.find({ author: {$in:friendlist} });
- 
-     res.send(posts)
-
-
+    res.status(200).json({
+      success: false,
+      message: "Friends post successfully fetch",
+      posts,
+    });
   } catch (error) {
     if (error.response && error.response.status === 404) {
       return res.status(404).json({
         success: false,
-        message: error.response.data.message||"User not found",
+        message: error.response.data.message || "User not found",
       });
     }
     res.status(500).json({
@@ -298,4 +293,4 @@ export const allFriendsPostsController = async (req,res)=>{
       error: error.message,
     });
   }
-}
+};
